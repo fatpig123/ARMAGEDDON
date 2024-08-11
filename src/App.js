@@ -1,22 +1,26 @@
-import React, { useCallback, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { DragDropContext, Droppable, Draggable, DroppableProps } from 'react-beautiful-dnd';
-import './App.css';
-
-
+import React, { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DroppableProps,
+} from "react-beautiful-dnd";
+import "./App.css";
 
 const initialItems = [
-  { id: '1', text: '날짜', checked: true },
-  { id: '2', text: '플랫폼', checked: true },
-  { id: '3', text: '상품명', checked: false },
-  { id: '4', text: '이벤트', checked: false },
-  { id: '5', text: '상품구성', checked: true },
+  { id: "1", text: "날짜", checked: true },
+  { id: "2", text: "플랫폼", checked: true },
+  { id: "3", text: "상품명", checked: false },
+  { id: "4", text: "이벤트", checked: false },
+  { id: "5", text: "상품구성", checked: true },
 ];
 
 function App() {
   const [items, setItems] = useState(initialItems);
   const [files, setFiles] = useState([]);
   const [isDragActive, setIsDragActive] = useState(false);
+  const [newFileName, setNewFileName] = useState([]);
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -29,7 +33,7 @@ function App() {
   };
 
   const handleCheckboxChange = (id) => {
-    const updatedItems = items.map(item =>
+    const updatedItems = items.map((item) =>
       item.id === id ? { ...item, checked: !item.checked } : item
     );
     setItems(updatedItems);
@@ -53,8 +57,7 @@ function App() {
     onDragEnter,
     onDragLeave,
   });
-  
-  
+
   return (
     <div className="container">
       <h1>파일명 변환기</h1>
@@ -62,11 +65,16 @@ function App() {
         <div className="left-side">
           <h2>파일 리스트</h2>
           <div
-            {...getRootProps({ className: `dropzone ${isDragActive ? 'active' : ''}` })}
+            {...getRootProps({
+              className: `dropzone ${isDragActive ? "active" : ""}`,
+            })}
           >
             <input {...getInputProps()} />
             <p>
-              <span role="img" aria-label="upload icon">📂</span> 여기에 파일을 드래그 앤 드롭하세요.
+              <span role="img" aria-label="upload icon">
+                📂
+              </span>{" "}
+              여기에 파일을 드래그 앤 드롭하세요.
             </p>
             {files.length > 0 && (
               <div className="file-list">
@@ -117,39 +125,65 @@ function App() {
               <div className="containerset">
                 <h3>다음 정보를 포함하기 & 드래그 해서 순서 바꾸기</h3>
                 <DragDropContext onDragEnd={handleDragEnd}>
-  <Droppable droppableId="items">
-    {(provided) => (
-      <div {...provided.droppableProps} ref={provided.innerRef}>
-        {items.map((item, index) => (
-          <Draggable key={item.id} draggableId={item.id} index={index}>
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                className="item"
-                style={{ userSelect: 'none', ...provided.draggableProps.style }}
-              >
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={item.checked}
-                    onChange={() => handleCheckboxChange(item.id)}
-                  />
-                  {item.text}
-                </label>
-              </div>
-            )}
-          </Draggable>
-        ))}
-        {provided.placeholder}
-      </div>
-    )}
-  </Droppable>
-</DragDropContext>
-
+                  <Droppable droppableId="items">
+                    {(provided) => (
+                      <div {...provided.droppableProps} ref={provided.innerRef}>
+                        {items.map((item, index) => (
+                          <Draggable
+                            key={item.id}
+                            draggableId={item.id}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className="item"
+                                style={{
+                                  userSelect: "none",
+                                  ...provided.draggableProps.style,
+                                }}
+                              >
+                                <label>
+                                  <input
+                                    type="checkbox"
+                                    checked={item.checked}
+                                    onChange={() =>
+                                      handleCheckboxChange(item.id)
+                                    }
+                                  />
+                                  {item.text}
+                                </label>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+      <div className="translate-file-container">
+        <div className="translate-file-wrapper">
+          <p>변환 전 파일목록</p>
+          <div className="translate-file-ul">
+            {files.map((file) => (
+              <div className="file-item">{file.name}</div>
+            ))}
+          </div>
+        </div>
+        <div className="translate-file-wrapper">
+          <p>변환 후 파일목록</p>
+          <div className="translate-file-ul">
+            {newFileName.map((name) => (
+              <div className="file-item">{name}</div>
+            ))}
           </div>
         </div>
       </div>
