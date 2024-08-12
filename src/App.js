@@ -4,7 +4,6 @@ import {
   DragDropContext,
   Droppable,
   Draggable,
-  DroppableProps,
 } from "react-beautiful-dnd";
 import "./App.css";
 
@@ -58,6 +57,12 @@ function App() {
     onDragLeave,
   });
 
+  const [selectedOption, setSelectedOption] = useState("eng");
+
+  const handleOptionChange = (event) => {
+    setSelectedOption(event.target.value);
+  };
+
   return (
     <div className="container">
       <h1>파일명 변환기</h1>
@@ -70,20 +75,26 @@ function App() {
             })}
           >
             <input {...getInputProps()} />
-            <p>
-              <span role="img" aria-label="upload icon">
-                📂
-              </span>{" "}
-              여기에 파일을 드래그 앤 드롭하세요.
-            </p>
-            {files.length > 0 && (
-              <div className="file-list">
-                <ul>
-                  {files.map((file, index) => (
-                    <li key={index}>{file.name}</li>
-                  ))}
-                </ul>
-              </div>
+            {files.length === 0 ? (
+              <p>
+                <span role="img" aria-label="upload icon">
+                  📂
+                </span>{" "}
+                여기에 파일을 드래그 앤 드롭하세요.
+              </p>
+            ) : (
+              <>
+                <div className="file-count">
+                  총 {files.length}개
+                </div>
+                <div className="file-list">
+                  <ul>
+                    {files.map((file, index) => (
+                      <li key={index}>{file.name}</li>
+                    ))}
+                  </ul>
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -95,12 +106,34 @@ function App() {
           <div className="controls">
             <div className="leftbox">
               <div className="radio-group options">
-                <div className="radio-option selected">
-                  <input type="radio" id="option1" name="options" value="eng" />
+                <div
+                  className={`radio-option ${
+                    selectedOption === "eng" ? "selected" : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    id="option1"
+                    name="radio-option"
+                    value="eng"
+                    checked={selectedOption === "eng"}
+                    onChange={handleOptionChange}
+                  />
                   <label htmlFor="option1">영어</label>
                 </div>
-                <div className="radio-option">
-                  <input type="radio" id="option2" name="options" value="kor" />
+                <div
+                  className={`radio-option last-option ${
+                    selectedOption === "kor" ? "selected" : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    id="option2"
+                    name="radio-option"
+                    value="kor"
+                    checked={selectedOption === "kor"}
+                    onChange={handleOptionChange}
+                  />
                   <label htmlFor="option2">한국어</label>
                 </div>
               </div>
@@ -112,7 +145,7 @@ function App() {
                   이벤트명 입력 <input type="text" />
                 </label>
               </div>
-              <div className="options">
+              <div className="options options-checkbox">
                 <label>
                   <input type="checkbox" /> 특수문자 모두제외
                 </label>
@@ -123,11 +156,16 @@ function App() {
             </div>
             <div className="rightbox">
               <div className="containerset">
-                <h3>다음 정보를 포함하기 & 드래그 해서 순서 바꾸기</h3>
+                <h3>
+                  다음 정보를 포함하기 &<br></br> 드래그 해서 순서 바꾸기
+                </h3>
                 <DragDropContext onDragEnd={handleDragEnd}>
                   <Droppable droppableId="items">
                     {(provided) => (
-                      <div {...provided.droppableProps} ref={provided.innerRef}>
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
                         {items.map((item, index) => (
                           <Draggable
                             key={item.id}
@@ -174,15 +212,15 @@ function App() {
           <p>변환 전 파일목록</p>
           <div className="translate-file-ul">
             {files.map((file) => (
-              <div className="file-item">{file.name}</div>
+              <div className="file-item" key={file.name}>{file.name}</div>
             ))}
           </div>
         </div>
         <div className="translate-file-wrapper">
           <p>변환 후 파일목록</p>
           <div className="translate-file-ul">
-            {newFileName.map((name) => (
-              <div className="file-item">{name}</div>
+            {newFileName.map((name, index) => (
+              <div className="file-item" key={index}>{name}</div>
             ))}
           </div>
         </div>
