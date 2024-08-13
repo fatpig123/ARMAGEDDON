@@ -1,4 +1,5 @@
 import React from "react";
+import { CallGPT } from "./components/api/APIConnect2";
 
 export default class transform extends React.Component {
   
@@ -35,7 +36,12 @@ export default class transform extends React.Component {
           
         }
       } 
+      this.handleClickAPICall();
     }
+
+    handleClickAPICall = async () => {
+      await CallGPT(); //TODO : 여기에 파라미터로 GPT 요소넣기
+    };
 
   render() {
     return (
