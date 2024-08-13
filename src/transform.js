@@ -1,4 +1,5 @@
 import React from "react";
+import { CallGPT } from "./components/api/APIConnect";
 
 export default class transform extends React.Component {
   
@@ -37,11 +38,16 @@ export default class transform extends React.Component {
       } 
     }
 
+    handleClickAPICall = async () => {
+      await CallGPT();
+    };
+
   render() {
     return (
       <div className="header">
         <h2>변환 옵션</h2>
-        <button className="convert-button" onClick={this.transform}>변환하기</button>
+        {/* <button className="convert-button" onClick={this.transform}>변환하기</button> */}
+        <button className="convert-button" onClick={this.handleClickAPICall}>변환하기</button>
       </div>
     );
   }
