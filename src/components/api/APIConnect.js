@@ -64,11 +64,11 @@ export const CallGPT = async (imgUrl) => {
   });
 
   const responseData = await response.json();
-  console.log("imgUrl", imgUrl);
-  console.log("responseData : ", responseData);
+  // console.log("imgUrl", imgUrl);
+  // console.log("responseData : ", responseData);
   console.log("responseDataContent : \n", responseData.choices[0].message.content);
 
-  return responseData;
+  return responseData.choices[0].message.content;
 };
 
 // export default APIConnect;

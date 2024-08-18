@@ -1,6 +1,5 @@
 import React, { useState, useEffect }from "react";
 import { CallGPT } from "./components/api/APIConnect";
-import FileBase64 from 'react-file-base64';
 
 function Transform(props) {
   const [imgList, setImgList] = useState([]);
@@ -33,10 +32,17 @@ function Transform(props) {
       }
       setImgList([...nowImageURLList]);
     }
+
   // OpenAI API호출
   useEffect(() => {
+    let fileNameResultList = [];
+    const callGtpAPI = async (imgUrl) => {
+      const result = await CallGPT(imgUrl);
+      fileNameResultList.push(result);
+      console.log(fileNameResultList);
+    };
     for (let imgUrl of imgList){
-      handleClickAPICall(imgUrl);
+      callGtpAPI(imgUrl);
     }
   },[imgList]);
 
@@ -51,10 +57,6 @@ function Transform(props) {
       reader.readAsDataURL(file);
     });
   }
-
-    const handleClickAPICall = async (imgUrl) => {
-      await CallGPT(imgUrl);
-    };
 
     return (
       <div className="header">
