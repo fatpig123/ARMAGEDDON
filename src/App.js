@@ -1,17 +1,14 @@
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-} from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./App.css";
+import Transform from "./transform";
 
 const initialItems = [
   { id: "1", text: "날짜", checked: true },
   { id: "2", text: "플랫폼", checked: true },
-  { id: "3", text: "상품명", checked: false },
-  { id: "4", text: "이벤트", checked: false },
+  { id: "3", text: "상품명", checked: true },
+  { id: "4", text: "이벤트", checked: true },
   { id: "5", text: "상품구성", checked: true },
 ];
 
@@ -20,6 +17,32 @@ function App() {
   const [files, setFiles] = useState([]);
   const [isDragActive, setIsDragActive] = useState(false);
   const [newFileName, setNewFileName] = useState([]);
+  const [newFileNameList, setNewFileNameList] = useState('');
+
+  const onSetNewFileName = (name) => {
+    setNewFileName(name);
+
+    setNewFileNameList(name.map((name, index) => (
+      <div className="file-item" key={index}>
+        {name}
+      </div>
+    )));
+  }
+
+  const [formData, setFormData] = useState({
+    specialInclude: false,
+    underbarInclude: false,
+    productName: "",
+    eventName: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -84,9 +107,7 @@ function App() {
               </p>
             ) : (
               <>
-                <div className="file-count">
-                  총 {files.length}개
-                </div>
+                <div className="file-count">총 {files.length}개</div>
                 <div className="file-list">
                   <ul>
                     {files.map((file, index) => (
@@ -99,10 +120,7 @@ function App() {
           </div>
         </div>
         <div className="right-side">
-          <div className="header">
-            <h2>변환 옵션</h2>
-            <button className="convert-button">변환하기</button>
-          </div>
+          <Transform files={files} items={items} lang={selectedOption} formData={formData} transformEvent={onSetNewFileName}/>
           <div className="controls">
             <div className="leftbox">
               <div className="radio-group options">
@@ -139,18 +157,36 @@ function App() {
               </div>
               <div className="options options2">
                 <label>
-                  상품명 입력 <input type="text" />
+                  상품명 입력 <input type="text"
+                                      name="productName"
+                                      value={formData.productName}
+                                      onChange={handleChange} />
                 </label>
                 <label>
-                  이벤트명 입력 <input type="text" />
+                  이벤트명 입력 <input type="text" 
+                                                        name="eventName"
+                                                        value={formData.eventName}
+                                                        onChange={handleChange} />
                 </label>
               </div>
               <div className="options options-checkbox">
                 <label>
-                  <input type="checkbox" /> 특수문자 모두제외
+                  <input
+                    type="checkbox"
+                    name="specialInclude"
+                    checked={formData.specialInclude}
+                    onChange={handleChange}
+                  />{" "}
+                  특수문자 모두제외
                 </label>
                 <label>
-                  <input type="checkbox" /> 언더바(_)만 허용
+                  <input
+                    type="checkbox"
+                    name="underbarInclude"
+                    checked={formData.underbarInclude}
+                    onChange={handleChange}
+                  />{" "}
+                  언더바(_)만 허용
                 </label>
               </div>
             </div>
@@ -162,10 +198,7 @@ function App() {
                 <DragDropContext onDragEnd={handleDragEnd}>
                   <Droppable droppableId="items">
                     {(provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                      >
+                      <div {...provided.droppableProps} ref={provided.innerRef}>
                         {items.map((item, index) => (
                           <Draggable
                             key={item.id}
@@ -212,16 +245,16 @@ function App() {
           <p>변환 전 파일목록</p>
           <div className="translate-file-ul">
             {files.map((file) => (
-              <div className="file-item" key={file.name}>{file.name}</div>
+              <div className="file-item" key={file.name}>
+                {file.name}
+              </div>
             ))}
           </div>
         </div>
         <div className="translate-file-wrapper">
           <p>변환 후 파일목록</p>
           <div className="translate-file-ul">
-            {newFileName.map((name, index) => (
-              <div className="file-item" key={index}>{name}</div>
-            ))}
+            {newFileNameList}
           </div>
         </div>
       </div>
