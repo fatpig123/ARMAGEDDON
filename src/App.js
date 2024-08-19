@@ -17,20 +17,24 @@ function App() {
   const [files, setFiles] = useState([]);
   const [isDragActive, setIsDragActive] = useState(false);
   const [newFileName, setNewFileName] = useState([]);
+  const [filePaths, setFilePaths] = useState('');
 
   const [formData, setFormData] = useState({
     specialInclude: false,
     underbarInclude: false,
     productName: "",
     eventName: "",
+    platformName: "",
+    date: "",
+    compositName: ""
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value, type, checked } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleDragEnd = (result) => {
@@ -52,6 +56,11 @@ function App() {
 
   const onDrop = useCallback((acceptedFiles) => {
     setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
+    // 파일 경로를 추출하여 새로운 배열 생성
+    const filePaths = acceptedFiles.map(file => file.path);
+
+    // 기존 파일 경로들에 새로운 파일 경로 추가
+    setFilePaths((prevPaths) => [...prevPaths, ...filePaths]);
     setIsDragActive(false);
   }, []);
 
@@ -109,7 +118,13 @@ function App() {
           </div>
         </div>
         <div className="right-side">
-          <Transform files={files} items={items} lang={selectedOption} formData={formData}/>
+          <Transform
+            files={files}
+            items={items}
+            lang={selectedOption}
+            formData={formData}
+            filePaths={filePaths}
+          />
           <div className="controls">
             <div className="leftbox">
               <div className="radio-group options">
@@ -146,16 +161,49 @@ function App() {
               </div>
               <div className="options options2">
                 <label>
-                  상품명 입력 <input type="text"
-                                      name="productName"
-                                      value={formData.productName}
-                                      onChange={handleChange} />
+                  플랫폼 입력{" "}
+                  <input
+                    type="text"
+                    name="platformName"
+                    value={formData.platformName}
+                    onChange={handleChange}
+                  />
                 </label>
                 <label>
-                  이벤트명 입력 <input type="text" 
-                                                        name="eventName"
-                                                        value={formData.eventName}
-                                                        onChange={handleChange} />
+                  날짜 입력{" "}
+                  <input
+                    type="text"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleChange}
+                  />
+                </label>
+                <label>
+                  상품구성 입력{" "}
+                  <input
+                    type="text"
+                    name="compositName"
+                    value={formData.compositName}
+                    onChange={handleChange}
+                  />
+                </label>
+                <label>
+                  이벤트명 입력{" "}
+                  <input
+                    type="text"
+                    name="eventName"
+                    value={formData.eventName}
+                    onChange={handleChange}
+                  />
+                </label>
+                <label>
+                  이벤트명 입력{" "}
+                  <input
+                    type="text"
+                    name="eventName"
+                    value={formData.eventName}
+                    onChange={handleChange}
+                  />
                 </label>
               </div>
               <div className="options options-checkbox">

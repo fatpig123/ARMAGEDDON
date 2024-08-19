@@ -10,6 +10,8 @@
 
 # production
 /build
+/destination_folder
+/dist
 
 # misc
 .DS_Store
