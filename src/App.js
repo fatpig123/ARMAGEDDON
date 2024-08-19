@@ -2,7 +2,10 @@ import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./App.css";
+import "./style.css";
 import Transform from "./transform";
+import CopyIcon from "./assets/icon/copy.png";
+import DownloadIcon from "./assets/icon/download.png";
 
 const initialItems = [
   { id: "1", text: "날짜", checked: true },
@@ -17,17 +20,63 @@ function App() {
   const [files, setFiles] = useState([]);
   const [isDragActive, setIsDragActive] = useState(false);
   const [newFileName, setNewFileName] = useState([]);
-  const [newFileNameList, setNewFileNameList] = useState('');
+  const [newFileNameList, setNewFileNameList] = useState([]);
+  const [tabType, setTabType] = useState("A");
+
+  const handleClickCopyButton = (name) => {
+    navigator.clipboard.writeText(name);
+    alert("클립보드에 복사되었습니다!");
+  };
+
+  const handleClickDownloadButton = (index, name) => {
+    const element = document.createElement("a");
+
+    let newFile = new Blob([files[index]], {
+      type: "img/jpg",
+    });
+
+    element.href = URL.createObjectURL(newFile);
+    element.download = name + ".jpg";
+    document.body.appendChild(element);
+    element.click();
+  };
+
+  const handleClickAllDownloadButton = () => {
+    files.forEach((file, idx) => {
+      const element = document.createElement("a");
+
+      let newFile = new Blob([files[idx]], {
+        type: "img/jpg",
+      });
+
+      element.href = URL.createObjectURL(newFile);
+      element.download = newFileName[idx] + ".jpg";
+      document.body.appendChild(element);
+      element.click();
+    });
+  };
 
   const onSetNewFileName = (name) => {
     setNewFileName(name);
 
-    setNewFileNameList(name.map((name, index) => (
-      <div className="file-item" key={index}>
-        {name}
-      </div>
-    )));
-  }
+    setNewFileNameList(
+      name.map((name, index) => (
+        <div className="translated-file-item" key={index}>
+          <p>{name}</p>
+          <div className="translated-file-button-wrapper">
+            <img
+              src={CopyIcon}
+              onClick={() => handleClickCopyButton(name)}
+            ></img>
+            <img
+              src={DownloadIcon}
+              onClick={() => handleClickDownloadButton(index, name)}
+            ></img>
+          </div>
+        </div>
+      ))
+    );
+  };
 
   const [formData, setFormData] = useState({
     specialInclude: false,
@@ -89,7 +138,10 @@ function App() {
   return (
     <div className="container">
       <h1>파일명 변환기</h1>
-      <div className="main-content">
+      <div
+        className="main-content"
+        style={{ display: tabType == "B" ? "none" : "flex" }}
+      >
         <div className="left-side">
           <h2>파일 리스트</h2>
           <div
@@ -120,7 +172,14 @@ function App() {
           </div>
         </div>
         <div className="right-side">
-          <Transform files={files} items={items} lang={selectedOption} formData={formData} transformEvent={onSetNewFileName}/>
+          <Transform
+            files={files}
+            items={items}
+            lang={selectedOption}
+            formData={formData}
+            transformEvent={onSetNewFileName}
+            tabEvent={setTabType}
+          />
           <div className="controls">
             <div className="leftbox">
               <div className="radio-group options">
@@ -157,16 +216,22 @@ function App() {
               </div>
               <div className="options options2">
                 <label>
-                  상품명 입력 <input type="text"
-                                      name="productName"
-                                      value={formData.productName}
-                                      onChange={handleChange} />
+                  상품명 입력{" "}
+                  <input
+                    type="text"
+                    name="productName"
+                    value={formData.productName}
+                    onChange={handleChange}
+                  />
                 </label>
                 <label>
-                  이벤트명 입력 <input type="text" 
-                                                        name="eventName"
-                                                        value={formData.eventName}
-                                                        onChange={handleChange} />
+                  이벤트명 입력{" "}
+                  <input
+                    type="text"
+                    name="eventName"
+                    value={formData.eventName}
+                    onChange={handleChange}
+                  />
                 </label>
               </div>
               <div className="options options-checkbox">
@@ -240,23 +305,40 @@ function App() {
           </div>
         </div>
       </div>
-      <div className="translate-file-container">
-        <div className="translate-file-wrapper">
-          <p>변환 전 파일목록</p>
-          <div className="translate-file-ul">
-            {files.map((file) => (
-              <div className="file-item" key={file.name}>
-                {file.name}
-              </div>
-            ))}
+      <div
+        className="translate-visual-wrapper"
+        style={{ display: tabType == "A" ? "none" : "block" }}
+      >
+        <div className="translate-file-container">
+          <div className="translate-file-wrapper">
+            <p>변환 전 파일목록</p>
+            <div className="translate-file-list">
+              {files.map((file) => (
+                <div className="file-item" key={file.name}>
+                  {file.name}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="translate-file-wrapper">
+            <p>변환 후 파일목록</p>
+            <div className="translate-file-list">{newFileNameList}</div>
           </div>
         </div>
-        <div className="translate-file-wrapper">
-          <p>변환 후 파일목록</p>
-          <div className="translate-file-ul">
-            {newFileNameList}
-          </div>
-        </div>
+        <button
+          className="convert-button"
+          onClick={handleClickAllDownloadButton}
+        >
+          다운로드
+        </button>
+        <button
+          className="convert-button"
+          onClick={() => {
+            window.location.reload();
+          }}
+        >
+          초기화
+        </button>
       </div>
     </div>
   );
