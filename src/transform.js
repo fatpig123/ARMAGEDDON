@@ -3,17 +3,14 @@ import { CallGPT } from "./components/api/APIConnect";
 
 function Transform(props) {
   const [imgList, setImgList] = useState([]);
-  
-    const transform = async () =>{
-      let files = props.files;
-      let items = props.items;
-      let lang = props.lang;
-      let formData = props.formData;
+  let files = props.files;
+  let items = JSON.stringify(props.items);
+  let lang = props.lang;
+  let formData = JSON.stringify(props.formData);
+  let fileNameResultList = [];
 
+    const transform = async () =>{
       const nowImageURLList = [];
-      alert(JSON.stringify(items));
-      alert(lang);
-      alert(JSON.stringify(formData));
       for(let i = 0; i < files.length; i++){
         const index = files[i].type.indexOf('/');
         const filetype = index !== -1 ? files[i].type.substring(0, index) : files[i].type;
@@ -35,14 +32,17 @@ function Transform(props) {
 
   // OpenAI API호출
   useEffect(() => {
-    let fileNameResultList = [];
     const callGtpAPI = async (imgUrl) => {
       const result = await CallGPT(imgUrl);
       fileNameResultList.push(result);
       console.log(fileNameResultList);
     };
     for (let imgUrl of imgList){
-      callGtpAPI(imgUrl);
+      callGtpAPI(imgUrl, lang, items, formData).then(() => {
+        console.log("***********");
+        console.log(fileNameResultList);
+        props.transformEvent(fileNameResultList);
+      });
     }
   },[imgList]);
 
