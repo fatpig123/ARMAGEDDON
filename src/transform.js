@@ -30,21 +30,23 @@ function Transform(props) {
       setImgList([...nowImageURLList]);
     }
 
-  // OpenAI API호출
-  useEffect(() => {
-    const callGtpAPI = async (imgUrl) => {
-      const result = await CallGPT(imgUrl);
-      fileNameResultList.push(result);
-      console.log(fileNameResultList);
-    };
-    for (let imgUrl of imgList){
-      callGtpAPI(imgUrl, lang, items, formData).then(() => {
-        console.log("***********");
-        console.log(fileNameResultList);
-        props.transformEvent(fileNameResultList);
-      });
-    }
-  },[imgList]);
+    // OpenAI API호출
+    useEffect(() => {
+      const callGtpAPI = async (imgList) => {
+        for (let imgUrl of imgList) {
+          await CallGPT(imgUrl, items, lang, formData).then((res) => {
+            // console.log("***********");
+            // console.log("res>", res)
+            fileNameResultList.push(res);
+            // console.log(fileNameResultList);
+            props.transformEvent(fileNameResultList);
+            // console.log("***********");
+  
+          });
+        }
+      };
+      callGtpAPI(imgList);
+    }, [imgList]);
 
   //base64로 파일 변경
   function convertToBase64(file) {
