@@ -57,7 +57,7 @@ function Transform(props) {
       reader.readAsDataURL(file);
     });
   }
-
+  
     return (
       <div className="header">
         <h2>변환 옵션</h2>
