@@ -18,6 +18,7 @@
   },
   "scripts": {
     "build": "react-scripts build",
+    "start": "react-scripts start",
     "electron-pack": "electron-builder"
   },
   "eslintConfig": {
