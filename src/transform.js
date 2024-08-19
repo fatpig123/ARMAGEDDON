@@ -5,7 +5,7 @@ function Transform(props) {
   const [imgList, setImgList] = useState([]);
   let files = props.files;
   let items = JSON.stringify(props.items);
-  let lang = props.lang;
+  let lang = JSON.stringify(props.lang);
   let formData = JSON.stringify(props.formData);
   let fileNameResultList = [];
 
@@ -35,20 +35,14 @@ function Transform(props) {
     useEffect(() => {
       const callGtpAPI = async (imgList) => {
         for (let imgUrl of imgList) {
-          await CallGPT(imgUrl).then((res) => {
-            console.log("***********");
-            console.log("res>", res)
+          await CallGPT(imgUrl, items, lang, formData).then((res) => {
             fileNameResultList.push(res);
-            console.log(fileNameResultList);
             props.transformEvent(fileNameResultList);
-            console.log("***********");
-  
           });
         }
       };
       callGtpAPI(imgList);
     }, [imgList]);
-
   //base64로 파일 변경
   function convertToBase64(file) {
     return new Promise((resolve, reject) => {

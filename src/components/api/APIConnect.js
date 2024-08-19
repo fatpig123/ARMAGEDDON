@@ -1,20 +1,30 @@
-export const CallGPT = async (imgUrl) => {
+export const CallGPT = async (imgUrl, items, lang, formData) => {
+  function isNull(value){
+    if (typeof value == undefined || typeof value == "undefined" || value == "undefined" || value == undefined || value == '') {
+      return true;
+    }
+  }
+
   // test 세팅
   const file_date = new Date().toLocaleString();
+  const order = "날짜, 파일명(프로젝트), 상세정보";
 
-  const message_list= [
+  const file_lang = JSON.parse(lang) == 'eng'? '영어' : "한글";
+  const form_data = JSON.parse(formData);
+  const formEventName = form_data.eventName;
+  const formProductName = form_data.productName;
+  const formSpecialInclude = form_data.specialInclude;
+  const formUnderbarInclude = form_data.underbarInclude;
+
+  const message_list = [
     {
       role: "system",
       content:
         "너는 파일명을 만들어주는 기계야. 컴퓨터 지식이 전혀 없는 사람들 대신 컴퓨터 문법을 가진 파일명을 만들어줘.",
     },
     {
-      role: "assistant",
-      content: "파일명은 날짜, 파일명(프로젝트), 상세정보 순서로 기입합니다. 각 요소를 섞거나 쪼개쓰지 않습니다.",
-    },
-    {
-      role: "assistant",
-      content: "파일명은 무조건 영어로 지어야합니다.",
+      role: "user",
+      content: `파일명 지을때 언어는 무조건 [${file_lang}]로 지어야해.`,
     },
     { role: "user", content: "파일명에 들어갈 날짜야:" + file_date },
     {
@@ -33,21 +43,41 @@ export const CallGPT = async (imgUrl) => {
     },
     {
       role: "user",
-      content: "복사하기 쉽게 파일명만 답해줘. 예=> [2024.05.23]hello_world_computer_2+1sale",
+      content:
+        "복사하기 쉽게 파일명만 답해줘. 예=> [2024.05.23]hello_world_computer_2+1sale, [2024.08.18]비블리브_올리브영_4box",
+    },
+    {
+      role: "user",
+      content: `파일명은 ${order} 순서로 기입해줘. 각 요소를 섞거나 쪼개쓰지 마.`,
+    },
+    {
+      role: "user",
+      content:
+        "다음은 파일명의 예시야. 참고해서 결과를 내줘. [2024.05.23]computer_helloWorld_2+1sale  [2024.03.29]맥주상세사항_와인나라_1+1_blackFriday  [2024.03.29]galaxySpec_danawa_newyearSale_membership",
     },
   ];
 
+  message_list.push({ role: "user", content: `파일명에 들어갈 날짜는 [${file_date}]이야.` });
+  if (!isNull(formEventName)){ message_list.push({ role: "user", content: `파일에 대한 이벤트 이름은 [${formEventName}]이야.` });}
+  if (!isNull(formProductName)){ message_list.push({ role: "user", content: `파일명(프로젝트)은 [${formProductName}]이야.` });}
   message_list.push({
     role: "user",
     content: [
-    {
-    "type": "text",
-            "text" : "이 그림을 보고 파일명을 지어줘."   
-    },    
-    {
-    "type": "image_url",
-            "image_url" : { "url": `${imgUrl}`}   
-    }]});
+      {
+        type: "text",
+        text: "이 그림을 보고 파일명을 지어줘.",
+      },
+      {
+        type: "image_url",
+        image_url: { url: `${imgUrl}` },
+      },
+    ],
+  });
+
+  if (!isNull(formUnderbarInclude)){ message_list.push({ role: "user", content: `스네이크 기법으로 만들어줘. _(언더바)를 제외한 특수문자는 모두 제외해줘.` });}
+  if (!isNull(formSpecialInclude)){ message_list.push({ role: "user", content: `특수문자는 모두 제외해하고 만들어줘.` });}
+
+  console.log(message_list);
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
