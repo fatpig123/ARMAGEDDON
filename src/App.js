@@ -17,6 +17,17 @@ function App() {
   const [files, setFiles] = useState([]);
   const [isDragActive, setIsDragActive] = useState(false);
   const [newFileName, setNewFileName] = useState([]);
+  const [newFileNameList, setNewFileNameList] = useState('');
+
+  const onSetNewFileName = (name) => {
+    setNewFileName(name);
+
+    setNewFileNameList(name.map((name, index) => (
+      <div className="file-item" key={index}>
+        {name}
+      </div>
+    )));
+  }
 
   const [formData, setFormData] = useState({
     specialInclude: false,
@@ -109,7 +120,7 @@ function App() {
           </div>
         </div>
         <div className="right-side">
-          <Transform files={files} items={items} lang={selectedOption} formData={formData}/>
+          <Transform files={files} items={items} lang={selectedOption} formData={formData} transformEvent={onSetNewFileName}/>
           <div className="controls">
             <div className="leftbox">
               <div className="radio-group options">
@@ -243,11 +254,7 @@ function App() {
         <div className="translate-file-wrapper">
           <p>변환 후 파일목록</p>
           <div className="translate-file-ul">
-            {newFileName.map((name, index) => (
-              <div className="file-item" key={index}>
-                {name}
-              </div>
-            ))}
+            {newFileNameList}
           </div>
         </div>
       </div>
